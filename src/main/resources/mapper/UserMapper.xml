@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.he.mapper.UserMapper">
+  <resultMap id="BaseResultMap" type="com.he.entity.User">
+    <!--User属性映射-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="username" property="username" />
+    <result column="age" property="age" />
+    <result column="address" property="address" />
+    <!--Role属性映射-->
+    <collection property="roleList" ofType="com.he.entity.Role" >
+      <id property="id" column="rid"></id>
+      <result property="name" column="name"></result>
+      <result property="desc" column="desc"></result>
+    </collection>
+  </resultMap>
+
+  <!--分步查询-->
+  <resultMap id="UserMap" type="com.he.entity.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="username" property="username" />
+    <result column="age" property="age" />
+    <result column="address" property="address" />
+  </resultMap>
+  <!--
+   select属性：指定用哪个查询来查询当前属性的数据 写法：包名.接口名.方法名
+   column属性：设置当前结果集中哪列的数据作为select属性指定的查询方法需要参数
+  -->
+  <resultMap id="userRoleMapBySelect" type="com.he.entity.User" extends="UserMap">
+    <collection property="roleList"
+                ofType="com.he.entity.Role"
+                select="com.he.mapper.RoleMapper.findRolesByUserId"
+                column="id">
+      <!-- fetchType="lazy"-->
+    </collection>
+  </resultMap>
+
+  <select id="findUserById" resultMap="BaseResultMap">
+    SELECT
+      u.id, u.username, u.age,u.address,
+      r.id rid, r.name, r.desc
+    FROM
+      user u, user_role ur, role r
+    WHERE
+	    u.id = ur.user_id
+	    AND r.id = ur.role_id
+	AND u.id = #{id}
+  </select>
+
+  <select id="findUserByName" resultMap="userRoleMapBySelect">
+    SELECT
+      id, username, age, address
+    FROM
+      user
+    WHERE
+        <if test="username != null">
+            username = #{username}
+        </if>
+  </select>
+  <select id="selectMaps" resultType="java.util.Map">
+    select id, username, age, address from user;
+  </select>
+  <select id="login" resultType="com.he.entity.User">
+    SELECT
+        id, username, password, age, address
+    FROM
+        user
+    WHERE
+    <if test="username != null">
+      username = #{username}
+    </if>
+    <if test="password != null">
+      and password = #{password}
+    </if>
+  </select>
+</mapper>

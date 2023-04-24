@@ -1,0 +1,28 @@
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.he.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# 全局设置懒加载(按需加载)
+#lazy-loading-enabled: true
+server:
+  port: 8082
+#  servlet:
+#    context-path: /book
+spring:
+  application:
+    name: book
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    name: defaultDataSource
+    password: 'root'
+    url: jdbc:mysql://localhost:3306/books?serverTimezone=Asia/Shanghai&useSSL=false
+    username: 'root'
+  # 开启热部署
+  devtools:
+    restart:
+      enabled: true
+# PageHelper插件 数据库方言、合理化分页
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
